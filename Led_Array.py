@@ -4,7 +4,7 @@ class Led_Array(object):
     def __init__(self):
         self.LED_COUNT      = 256      # Number of LED pixels.
         self.LED_PIN        = 18      # GPIO pin connected to the pixels (must support PWM!).
-        self.LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
+        self.LED_FREQ_HZ    = 900000  # LED signal frequency in hertz (usually 800khz)
         self.LED_DMA        = 5       # DMA channel to use for generating signal (try 5)
         self.LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
         self.LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
@@ -20,7 +20,7 @@ class Led_Array(object):
 
     	# Intialize the library (must be called once before other functions).
         self.led_array.begin()
-    
+
     def _info(self):
         return self.LED_COUNT, self.LED_PIN, self.LED_BRIGHTNESS, self.ROW_WIDTH
 

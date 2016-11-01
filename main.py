@@ -68,7 +68,7 @@ def renderMessages(message_array):
 	for message in message_array:
 		row = i*4
 		led_array.fill_rect(row, 3, message['color'])
-		time.sleep(2)
+		# time.sleep(2)
 		led_array.render()
 		i = i + 1
 
