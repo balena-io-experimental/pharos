@@ -7,7 +7,7 @@ from colour import Color
 
 import time,signal,sys, datetime
 from time import sleep
-from Led_Array import Led_Array, Color
+from Led_Array import Led_Array
 
 led_array = Led_Array()
 
