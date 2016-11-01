@@ -6,7 +6,7 @@ FROM resin/raspberrypi3-python:2.7
 # 	&& apt-get clean \
 # 	&& rm -rf /var/lib/apt/lists/*
 
-RUN pip install rpi_ws281x
+RUN pip install rpi_ws281x requests pydash spectra
 
 WORKDIR /usr/src/app
 

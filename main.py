@@ -1,18 +1,65 @@
+import os
+import datetime as dt
+import time
+import requests
+import spectra
+from pydash import py_
+
 import time,signal,sys, datetime
 from time import sleep
 from Led_Array import Led_Array, Color
 
-RED = Color(100, 0, 0)
-GREEN = Color(0, 100, 0)
-BLUE = Color(0,0,100)
-
 led_array = Led_Array()
 
-test_array = [{'is_inbound': True, 'msgId': u'msg_4mhetg', 'time_elapsed': datetime.timedelta(0, 1753, 356637), 'color': 234235}, \
-            {'is_inbound': True, 'msgId': u'msg_4mfilb', 'time_elapsed': datetime.timedelta(0, 1436, 356654), 'color': 16711782}, \
-            {'is_inbound': True, 'msgId': u'msg_4mekrn', 'time_elapsed': datetime.timedelta(0, 11823, 356659), 'color': 234235}, \
-            {'is_inbound': True, 'msgId': u'msg_4mekrn', 'time_elapsed': datetime.timedelta(0, 1799, 356659), 'color': 234235}, \
-            {'is_inbound': True, 'msgId': u'msg_4m43sm', 'time_elapsed': datetime.timedelta(0, 74521, 356663), 'color': 16711782}]
+HEADERS = { 'Authorization': 'Bearer ' + os.environ['FRONT_TOKEN'] }
+INBOX_IDS = os.getenv('INBOX_IDS', 'inb_n62,inb_nla').split(',')
+COLORS = os.getenv('COLORS', '#3aff5b,#f44242').split(',')
+COLOR_SCALE = spectra.scale(COLORS).domain([0, 60])
+
+def getConvos(inboxId, pageIndex):
+	resultArr = list()
+	i = str(pageIndex) or '1'
+	url = 'https://api2.frontapp.com/inboxes/' + inboxId + '/conversations?q[statuses][]=unassigned&q[statuses][]=assigned&page=' + i
+	r = requests.get(url, headers=HEADERS)
+	rjson = r.json()
+
+	# Append items to results array
+	resultArr.extend(rjson['_results'])
+	# If there are more results from front run the getter again
+	if rjson['_pagination']['next'] is not None:
+		getConvos(inboxId, pageIndex + 1)
+	else:
+		print resultArr[0]['status']
+		# print resultArr
+		return resultArr
+
+def timeElapsed(ts):
+	return (dt.datetime.now() - (dt.datetime.fromtimestamp(int(ts)))).total_seconds()/60
+
+def getName(tag):
+	return tag['name']
+
+def getColor(ts):
+	# try apply color scale if fails assume exceeded and return last value
+	try:
+		return int(COLOR_SCALE(timeElapsed(ts)).hexcode[1:], 16)
+	except:
+		return int(py_.last(COLORS)[1:], 16)
+
+def stripSearch(convo):
+	newObj = {
+		'color' : getColor(convo['last_message']['created_at']),
+		'tags'  : py_.map(convo['tags'], getName),
+	}
+	return newObj
+
+def run():
+	return py_(INBOX_IDS).map(getConvos) \
+						 .flatten() \
+						 .filter(lambda x: \
+						  x['last_message']['is_inbound'] == True ) \
+						 .map(stripSearch) \
+				  		 .value()
 
 def renderMessages(message_array):
     led_array.empty_array()
@@ -32,8 +79,10 @@ def handleSIGTERM():
 
 signal.signal(signal.SIGTERM, handleSIGTERM)
 
-renderMessages(test_array)
 
-while True:
-    print("waiting...")
-    time.sleep(30)
+if __name__ == '__main__':
+	while (True):
+		print run()
+        renderMessages(run())
+		time.sleep(30)
+
