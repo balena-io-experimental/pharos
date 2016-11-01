@@ -9,10 +9,10 @@ BLUE = Color(0,0,100)
 led_array = Led_Array()
 
 test_array = [{'is_inbound': True, 'msgId': u'msg_4mhetg', 'time_elapsed': datetime.timedelta(0, 1753, 356637), 'color': 234235}, \
-            {'is_inbound': True, 'msgId': u'msg_4mfilb', 'time_elapsed': datetime.timedelta(0, 1436, 356654), 'color': 234235}, \
+            {'is_inbound': True, 'msgId': u'msg_4mfilb', 'time_elapsed': datetime.timedelta(0, 1436, 356654), 'color': 16711782}, \
             {'is_inbound': True, 'msgId': u'msg_4mekrn', 'time_elapsed': datetime.timedelta(0, 11823, 356659), 'color': 234235}, \
             {'is_inbound': True, 'msgId': u'msg_4mekrn', 'time_elapsed': datetime.timedelta(0, 1799, 356659), 'color': 234235}, \
-            {'is_inbound': True, 'msgId': u'msg_4m43sm', 'time_elapsed': datetime.timedelta(0, 74521, 356663), 'color': 234235}]
+            {'is_inbound': True, 'msgId': u'msg_4m43sm', 'time_elapsed': datetime.timedelta(0, 74521, 356663), 'color': 16711782}]
 
 def renderMessages(message_array):
     led_array.empty_array()
