@@ -65,7 +65,7 @@ def run():
 						   .value()
 
 def renderMessages(message_array):
-	led_array.empty_array()
+	# led_array.empty_array()
 	i = 0
 	for message in message_array:
 		row = i*4
