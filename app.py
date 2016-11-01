@@ -3,13 +3,15 @@ import os
 import datetime as dt
 import time
 import requests
-import spectra
 from pydash import py_
+from colour import Color
 
 HEADERS = { 'Authorization': 'Bearer ' + os.environ['FRONT_TOKEN'] }
 INBOX_IDS = os.getenv('INBOX_IDS', 'inb_n62,inb_nla').split(',')
 COLORS = os.getenv('COLORS', '#3aff5b,#f44242').split(',')
-COLOR_SCALE = spectra.scale(COLORS).domain([0, 60])
+colorStart = Color(COLORS[0])
+colorEnd = Color(COLORS[1])
+COLOR_SCALE = list(colorStart.range_to(colorEnd, 60))
 
 def getConvos(inboxId, pageIndex):
 	resultArr = list()
@@ -29,7 +31,7 @@ def getConvos(inboxId, pageIndex):
 		return resultArr
 
 def timeElapsed(ts):
-	return (dt.datetime.now() - (dt.datetime.fromtimestamp(int(ts)))).total_seconds()/60
+	return int((dt.datetime.now() - (dt.datetime.fromtimestamp(int(ts)))).total_seconds()/60)
 
 def getName(tag):
 	return tag['name']
@@ -37,7 +39,7 @@ def getName(tag):
 def getColor(ts):
 	# try apply color scale if fails assume exceeded and return last value
 	try:
-		return int(COLOR_SCALE(timeElapsed(ts)).hexcode[1:], 16)
+		return int(COLOR_SCALE[timeElapsed(ts)].hex[1:], 16)
 	except:
 		return int(py_.last(COLORS)[1:], 16)
 
