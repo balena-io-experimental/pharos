@@ -31,8 +31,6 @@ def getConvos(inboxId, pageIndex):
 	if rjson['_pagination']['next'] is not None:
 		getConvos(inboxId, pageIndex + 1)
 	else:
-		print resultArr[0]['status']
-		# print resultArr
 		return resultArr
 
 def timeElapsed(ts):
@@ -65,7 +63,7 @@ def run():
 						   .value()
 
 def renderMessages(message_array):
-	# led_array.empty_array()
+	led_array.empty_array()
 	i = 0
 	for message in message_array:
 		row = i*4
@@ -74,7 +72,7 @@ def renderMessages(message_array):
 		led_array.render()
 		i = i + 1
 
-	# led_array.render()
+	led_array.render()
 
 def handleSIGTERM():
 	del led_array
