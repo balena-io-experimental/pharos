@@ -21,6 +21,7 @@ def renderMessages(message_array):
         dt_sec = message['time_elapsed'].seconds
         if dt_sec > 1800:
             color = Color(100, 0, 0) #RED
+            print color
         else:
             color = Color(0, 0, 100) #BLUE
         row = i*4 
@@ -36,6 +37,7 @@ def renderMessages(message_array):
 def handleSIGTERM():
     del led_array
     sys.exit()
+
 signal.signal(signal.SIGTERM, handleSIGTERM)
 
 renderMessages(test_array)
