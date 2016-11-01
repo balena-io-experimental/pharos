@@ -62,23 +62,23 @@ def run():
 						 .filter(lambda x: \
 						  x['last_message']['is_inbound'] == True ) \
 						 .map(stripSearch) \
-				  		 .value()
+						   .value()
 
 def renderMessages(message_array):
-    led_array.empty_array()
-    i = 0
-    for message in message_array:
-        row = i*4
-        led_array.fill_rect(row, 3, message['color'])
-        time.sleep(2)
-        led_array.render()
-        i = i + 1
+	led_array.empty_array()
+	i = 0
+	for message in message_array:
+		row = i*4
+		led_array.fill_rect(row, 3, message['color'])
+		time.sleep(2)
+		led_array.render()
+		i = i + 1
 
-    # led_array.render()
+	# led_array.render()
 
 def handleSIGTERM():
-    del led_array
-    sys.exit()
+	del led_array
+	sys.exit()
 
 signal.signal(signal.SIGTERM, handleSIGTERM)
 
@@ -86,5 +86,5 @@ signal.signal(signal.SIGTERM, handleSIGTERM)
 if __name__ == '__main__':
 	while (True):
 		print run()
-        renderMessages(run())
+		renderMessages(run())
 		time.sleep(30)
