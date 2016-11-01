@@ -1,0 +1,8 @@
+local_resinos:
+  app-name: pysupport
+  build-triggers:
+    - Dockerfile: 01a12c1e95496c63ccbc5fd8e5b50c7517b74663ea3184dd087e620a65fbcb72
+ignore:
+  - .git
+  - node_modules/
+destination: /usr/src/app

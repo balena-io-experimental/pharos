@@ -1,10 +1,15 @@
-#!/usr/bin/env python
 import os
 import datetime as dt
 import time
 import requests
 from pydash import py_
 from colour import Color
+
+import time,signal,sys, datetime
+from time import sleep
+from Led_Array import Led_Array, Color
+
+led_array = Led_Array()
 
 HEADERS = { 'Authorization': 'Bearer ' + os.environ['FRONT_TOKEN'] }
 INBOX_IDS = os.getenv('INBOX_IDS', 'inb_n62,inb_nla').split(',')
@@ -38,12 +43,10 @@ def getName(tag):
 
 def getColor(ts):
 	# try apply color scale if fails assume exceeded and return last value
-		timeout = timeElapsed(ts)
-		if timeout > 60:
-			return int(py_.last(COLORS)[1:], 16)
-		else:
-			return int(COLOR_SCALE[timeElapsed(ts)].hex[1:], 16)
-
+	try:
+		return int(COLOR_SCALE[timeElapsed(ts)].hex[1:], 16)
+	except:
+		return int(py_.last(COLORS)[1:], 16)
 
 def stripSearch(convo):
 	newObj = {
@@ -60,7 +63,28 @@ def run():
 						 .map(stripSearch) \
 				  		 .value()
 
+def renderMessages(message_array):
+    led_array.empty_array()
+    i = 0
+    for message in message_array:
+        row = i*4 
+        led_array.fill_rect(row, 3, message['color'])
+        time.sleep(2)
+        led_array.render()
+        i = i + 1
+
+    # led_array.render()
+
+def handleSIGTERM():
+    del led_array
+    sys.exit()
+
+signal.signal(signal.SIGTERM, handleSIGTERM)
+
+
 if __name__ == '__main__':
 	while (True):
 		print run()
-		time.sleep(10)
+        renderMessages(run())
+		time.sleep(30)
+
