@@ -43,10 +43,11 @@ def getName(tag):
 
 def getColor(ts):
 	# try apply color scale if fails assume exceeded and return last value
-	try:
-		return int(COLOR_SCALE[timeElapsed(ts)].hex[1:], 16)
-	except:
+	timeout = timeElapsed(ts)
+	if timeout > 60:
 		return int(py_.last(COLORS)[1:], 16)
+	else:
+		return int(COLOR_SCALE[timeElapsed(ts)].hex[1:], 16)
 
 def stripSearch(convo):
 	newObj = {
@@ -67,7 +68,7 @@ def renderMessages(message_array):
     led_array.empty_array()
     i = 0
     for message in message_array:
-        row = i*4 
+        row = i*4
         led_array.fill_rect(row, 3, message['color'])
         time.sleep(2)
         led_array.render()
@@ -87,4 +88,3 @@ if __name__ == '__main__':
 		print run()
         renderMessages(run())
 		time.sleep(30)
-
