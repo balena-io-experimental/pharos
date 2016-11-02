@@ -32,7 +32,7 @@ def getConvos(inboxId, pageIndex):
 		return resultArr
 
 def timeElapsed(ts):
-	return int((dt.datetime.now() - (dt.datetime.fromtimestamp(int(ts)))).total_seconds()/60)
+	return int((dt.datetime.now() - (dt.datetime.fromtimestamp(int(ts)))).total_seconds())
 
 def getName(tag):
 	return tag['name']
@@ -43,22 +43,42 @@ def getColor(ts):
 	if timeout > 60:
 		return int(py_.last(COLORS)[1:], 16)
 	else:
-		return int(COLOR_SCALE[timeElapsed(ts)].hex[1:], 16)
+		return int(COLOR_SCALE[timeElapsed(ts)/60].hex[1:], 16)
 
 def stripSearch(convo):
-	newObj = {
+	return {
 		'color' : getColor(convo['last_message']['created_at']),
 		'tags'  : py_.map(convo['tags'], getName),
+		'timeElapsed': timeElapsed(convo['last_message']['created_at'])
 	}
-	return newObj
+
+def getLatestComment(convo):
+	r = requests.get(convo['_links']['related']['comments'], headers=HEADERS)
+	comments = r.json()['_results']
+	if not py_.is_empty(comments):
+		# get latest
+		return py_.pick(comments[0], 'body', 'posted_at')
+
+def isLatestMsg(convo):
+	comment = getLatestComment(convo)
+	msg = convo['last_message']
+	# check if the latest message is newer than latest comment
+	try:
+		if timeElapsed(msg['created_at']) < timeElapsed(comment['posted_at']):
+			return convo
+ 	except:
+		return convo
 
 def run():
-	return py_(INBOX_IDS).map(getConvos) \
-						 .flatten() \
-						 .filter(lambda x: \
+	items = py_(INBOX_IDS).map(getConvos) \
+						.flatten() \
+						.filter(lambda x: \
 						  x['last_message']['is_inbound'] == True ) \
-						 .map(stripSearch) \
-						   .value()
+						.filter(isLatestMsg) \
+						.map(stripSearch) \
+						.value()
+	print items
+	return items
 
 def renderMessages(message_array):
 	led_array = Led_Array()
@@ -83,6 +103,5 @@ signal.signal(signal.SIGTERM, handleSIGTERM)
 
 if __name__ == '__main__':
 	while (True):
-		print run()
 		renderMessages(run())
 		time.sleep(30)
