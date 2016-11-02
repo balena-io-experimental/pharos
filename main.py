@@ -15,6 +15,7 @@ COLORS = os.getenv('COLORS', '#3aff5b,#f44242').split(',')
 colorStart = Color(COLORS[0])
 colorEnd = Color(COLORS[1])
 COLOR_SCALE = list(colorStart.range_to(colorEnd, 60))
+INTERVAL = int(os.getenv('INTERVAL', '5'))
 
 def getConvos(inboxId, pageIndex):
 	resultArr = list()
@@ -104,4 +105,4 @@ signal.signal(signal.SIGTERM, handleSIGTERM)
 if __name__ == '__main__':
 	while (True):
 		renderMessages(run())
-		time.sleep(30)
+		time.sleep(INTERVAL)
