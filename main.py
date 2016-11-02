@@ -41,16 +41,17 @@ def getName(tag):
 def getColor(ts):
 	# try apply color scale if fails assume exceeded and return last value
 	timeout = timeElapsed(ts)
-	if timeout > 60:
+	if timeout > 60*60:
 		return int(py_.last(COLORS)[1:], 16)
 	else:
-		return int(COLOR_SCALE[timeElapsed(ts)/60].hex[1:], 16)
+		return int(COLOR_SCALE[(timeElapsed(ts)/60)].hex[1:], 16)
 
 def stripSearch(convo):
 	return {
 		'color' : getColor(convo['last_message']['created_at']),
 		'tags'  : py_.map(convo['tags'], getName),
-		'timeElapsed': timeElapsed(convo['last_message']['created_at'])
+		'timeElapsed': timeElapsed(convo['last_message']['created_at']),
+		'timeElapsedMins': timeElapsed(convo['last_message']['created_at'])/60
 	}
 
 def getLatestComment(convo):
