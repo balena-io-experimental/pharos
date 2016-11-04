@@ -9,6 +9,8 @@ import time,signal,sys, datetime
 from time import sleep
 from Led_Array import Led_Array
 
+led_array = Led_Array()
+
 HEADERS = { 'Authorization': 'Bearer ' + os.environ['FRONT_TOKEN'] }
 INBOX_IDS = os.getenv('INBOX_IDS', 'inb_n62,inb_nla').split(',')
 COLORS = os.getenv('COLORS', '#3aff5b,#f44242').split(',')
@@ -83,7 +85,6 @@ def run():
 	return items
 
 def renderMessages(message_array):
-	led_array = Led_Array()
 	led_array.empty_array()
 	i = 0
 	for message in message_array:
