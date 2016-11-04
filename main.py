@@ -95,7 +95,6 @@ def renderMessages(message_array):
 		i = i + 1
 
 	led_array.render()
-	del led_array
 
 def handleSIGTERM():
 	del led_array
