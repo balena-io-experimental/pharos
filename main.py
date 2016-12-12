@@ -4,6 +4,7 @@ import time
 import requests
 from pydash import py_
 from colour import Color
+import json
 
 import time,signal,sys, datetime
 from time import sleep
@@ -18,6 +19,12 @@ colorStart = Color(COLORS[0])
 colorEnd = Color(COLORS[1])
 COLOR_SCALE = list(colorStart.range_to(colorEnd, 60))
 INTERVAL = int(os.getenv('INTERVAL', '5'))
+
+print 'Available ENV vars:'
+print '  FRONT_TOKEN'
+print '  INBOX_IDS'
+print '  COLORS'
+print '  INTERVAL'
 
 def getConvos(inboxId, pageIndex):
 	resultArr = list()
@@ -50,10 +57,11 @@ def getColor(ts):
 
 def stripSearch(convo):
 	return {
-		'color' : getColor(convo['last_message']['created_at']),
-		'tags'  : py_.map(convo['tags'], getName),
-		'timeElapsed': timeElapsed(convo['last_message']['created_at']),
-		'timeElapsedMins': timeElapsed(convo['last_message']['created_at'])/60
+		'color'             : getColor(convo['last_message']['created_at']),
+		'tags'              : py_.map(convo['tags'], getName),
+		'timeElapsed'       : timeElapsed(convo['last_message']['created_at']),
+		'timeElapsedMins'   : timeElapsed(convo['last_message']['created_at'])/60,
+		'conversation_link' : "https://app.frontapp.com/open/" + convo['id']
 	}
 
 def getLatestComment(convo):
@@ -70,18 +78,20 @@ def isLatestMsg(convo):
 	try:
 		if timeElapsed(msg['created_at']) < timeElapsed(comment['posted_at']):
 			return convo
- 	except:
+	except:
 		return convo
 
 def run():
 	items = py_(INBOX_IDS).map(getConvos) \
-						.flatten() \
-						.filter(lambda x: \
-						  x['last_message']['is_inbound'] == True ) \
-						.filter(isLatestMsg) \
-						.map(stripSearch) \
-						.value()
-	print items
+		.flatten() \
+		.filter(lambda x: x['last_message']['is_inbound'] == True ) \
+		.filter(isLatestMsg) \
+		.map(stripSearch) \
+		.value()
+
+	# Output the list of pending convos to the logs for debugging
+	print json.dumps(items, sort_keys=True, indent=2, separators=(',', ': '))
+
 	return items
 
 def renderMessages(message_array):
@@ -107,3 +117,4 @@ if __name__ == '__main__':
 	while (True):
 		renderMessages(run())
 		time.sleep(INTERVAL)
+

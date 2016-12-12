@@ -1,17 +1,13 @@
-FROM resin/raspberrypi3-python:2.7
+FROM resin/raspberrypi2-python:2.7
 
-# RUN apt-get update \
-# 	&& apt-get install -yq \
-#     	python-pyaudio \
-# 	&& apt-get clean \
-# 	&& rm -rf /var/lib/apt/lists/*
-
-RUN pip install rpi_ws281x requests pydash colour
-
-WORKDIR /usr/src/app
-
-COPY . .
+RUN pip install \
+	colour \
+	pydash \
+	requests \
+	rpi_ws281x
 
 CMD python -u main.py
 
+WORKDIR /usr/src/app
+COPY . .
 
